@@ -4,6 +4,7 @@ import router from './routes/role_router.js';
 import user_router from './routes/user_router.js';
 import { ErrorHandler } from './middlewares/error_handler.js';
 import { config } from './configurations/config.js';
+import { sendmail } from './sendemail.js';
 
 
 const app = express();
@@ -17,7 +18,7 @@ app.use(ErrorHandler);
 
 const Start = async() =>{
     try{
-        
+        sendmail();
         // creating connection
        Connection.connect();
 
