@@ -18,7 +18,7 @@ app.use(ErrorHandler);
 
 const Start = async() =>{
     try{
-        sendmail();
+        // sendmail();
         // creating connection
        Connection.connect();
 

@@ -3,12 +3,12 @@ import { config } from './configurations/config.js';
 
 pkg.setApiKey(config.sendmail_apikey) 
 
-export const sendmail = () => {
+export const sendmail = (email) => {
     const msg = {
-        to: 'timalsinaanil96@gmail.com', // Change to your recipient
-        from: 'mepujan10@gmail.com', // Change to your verified sender
+        to: email, // Change to your recipient
+        from: 'timedoctor29@gmail.com', // Change to your verified sender
         subject: 'Account update',
-        html: '<strong>Your account is updated</strong>',
+        html: '<strong>Your account has been updated.</strong>',
       }
 
 pkg.send(msg)
