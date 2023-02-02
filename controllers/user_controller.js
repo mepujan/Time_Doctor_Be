@@ -21,6 +21,7 @@ export const updateUser = async(req,res,next) => {
             sendmail(email);
             sendSMS(mobile_number);
         }
+       
         return res.status(200).json({"message":"User Account is Updated"});
     } catch(e) {
         next(e);

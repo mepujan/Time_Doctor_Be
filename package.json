@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "This is surgery scheduling web application",
   "main": "index.js",
-  "type": "module",
   
   "scripts": {
     "start": "node index.js",
