@@ -7,6 +7,8 @@ export const config = {
     db_user_name: process.env.User,
     db_password: process.env.Password,
     db_name : process.env.DB_Name,
-    sendmail_apikey: process.env.SENDGRID_API_KEY
+    sendmail_apikey: process.env.SENDGRID_API_KEY,
+    twilio_auth_token:process.env.TWILIO_AUTH_TOKEN,
+    twilio_account_sid : process.env.Account_sid
 
 }
