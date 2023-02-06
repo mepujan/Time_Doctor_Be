@@ -11,11 +11,11 @@ export const LoginController = async(req,res,next) =>{
      * provided by sequelize, if there is user
      * Again check if provided password is correct or not using bcrypt compare function
      * if password is validated, authorization is provided otherwise unauthorized message
-     * is sent to user.
+     * is sent to
      */
     try{
-        const {email,password} = req.body;
-        const user = await User.findOne({where:{email:email,},include:Role});
+        const {username,password} = req.body;
+        const user = await User.findOne({where:{user_name:username},include:Role});
         if(user){
             const does_password_match = await bcrypt.compare(password,user.password);
             if(does_password_match){
