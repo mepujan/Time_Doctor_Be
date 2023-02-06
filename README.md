@@ -28,11 +28,13 @@ Bluewater Health has been overwhelmed by the significant number of surgeries req
 2. Install all the packages required using command:
 `npm install`
 
-3. Create .env file and include all database configuration and other secret keys as per the `configuration/config.js` file:
+3. Create .env file and include all database configuration and other secret keys as per the `configurations/config.js` file:
 
-4. Create Database name `timedoctor` in mysql.
+4. Create folders `images/profile_picture` in project level directory. This folder consist of all the images uploaded to the database.
 
-5. Run the project using commands:
+5. Create Database name `timedoctor` in mysql.
+
+6. Run the project using commands:
 `npm run dev` or
 `npm start`
 
