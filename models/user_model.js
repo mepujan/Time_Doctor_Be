@@ -36,6 +36,10 @@ export default User.init({
         allowNull:false,
         unique:true
     },
+    password :{
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     mobile_number:{
         type:DataTypes.STRING,
         allowNull:false,
