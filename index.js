@@ -1,18 +1,22 @@
 import express from 'express';
-import Connection from './database_connection.js';
+// import Connection from './database_connection.js';
 import router from './routes/role_router.js';
 import user_router from './routes/user_router.js';
 import auth_router from './routes/auth_router.js';
 import { ErrorHandler } from './middlewares/error_handler.js';
 import { config } from './configurations/config.js';
+import bodyParser from 'body-parser';
+import { sequelize } from './sequelize_connection.js';
 
 
 
 const app = express();
-const PORT = 3000;
+const PORT = config.port;
 
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use('/images',express.static('images'));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
 app.use(router);
 app.use(user_router);
 app.use(auth_router);
@@ -20,15 +24,8 @@ app.use(ErrorHandler);
 
 const Start = async() =>{
     try{
-        // sendmail();
         // creating connection
-       Connection.connect();
-
-        // assigning database creating query to variable
-        const db_create_query = `CREATE DATABASE IF NOT EXISTS ${config.db_name}`;
-
-        //executing the query
-        await Connection.query(db_create_query);
+        sequelize.authenticate();
         app.listen(PORT,()=>{
             console.log(`Successfully Connected to Database ${config.db_name}.`);
             console.log(`Server is running on port ${PORT}`)

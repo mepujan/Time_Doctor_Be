@@ -15,7 +15,10 @@ export const LoginController = async(req,res,next) =>{
      */
     try{
         const {username,password} = req.body;
-        const user = await User.findOne({where:{user_name:username},include:Role});
+        const user = await User.findOne({
+            where:{user_name:username},
+            attributes:{exclude:['role_id','roleId','createdAt','updatedAt']},
+            include:{model:Role,attributes:['name']}});
         if(user){
             const does_password_match = await bcrypt.compare(password,user.password);
             if(does_password_match){

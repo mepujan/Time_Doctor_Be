@@ -4,6 +4,7 @@ import { sendSMS } from '../sendSMS.js';
 import { config } from '../configurations/config.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import path from 'path';
 
 
 export const createUser = async(req,res,next) =>{
@@ -16,8 +17,10 @@ export const createUser = async(req,res,next) =>{
     try{
         const {password} = req.body;
         const user = User.build(req.body);
+        console.log(req.file);
         const hash_password = await bcrypt.hash(password,10);
         user.password = hash_password;
+        user.profile_image = path.join(config.host,req.file.path);
         const result = await user.save();
         const token = jwt.sign({email: result.email, id: result.id, username: result.user_name},config.jwt_secret_key);
         return res.status(201).json({"message":"User Account Created Successfully.",result,token});

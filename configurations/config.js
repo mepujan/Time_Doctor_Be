@@ -15,6 +15,7 @@ export const config = {
     sendmail_apikey: process.env.SENDGRID_API_KEY,
     twilio_auth_token:process.env.TWILIO_AUTH_TOKEN,
     twilio_account_sid : process.env.Account_sid,
-    jwt_secret_key: process.env.Secret_Key
-
+    jwt_secret_key: process.env.Secret_Key,
+    host: process.env.Server_Host,
+    port: process.env.Port
 }

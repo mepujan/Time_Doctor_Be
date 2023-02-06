@@ -72,7 +72,13 @@ export default User.init({
     },
     profile_image:{
         type:DataTypes.STRING,
-        allowNull: true
+        allowNull: false,
+        name:{
+            type:DataTypes.STRING
+        },
+        data: {
+            type:DataTypes.BLOB("long")
+        }
     }
     
 },{
