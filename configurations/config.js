@@ -2,6 +2,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+/**
+ * exporting the configurations data fetching from the environment file
+ * so that it can be maintained easily placing it in one place and making them
+ * available from there.
+ */
 export const config = {
     db_host_name: process.env.Host,
     db_user_name: process.env.User,

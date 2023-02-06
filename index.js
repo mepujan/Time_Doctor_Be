@@ -34,6 +34,7 @@ const Start = async() =>{
             console.log(`Server is running on port ${PORT}`)
         });
     }catch(error){
+        //displaying the error for debug.
         console.log(error);
         console.log("Failed To Connect to Database. Server is not running");
     }

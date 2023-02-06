@@ -6,6 +6,13 @@ import { config } from '../configurations/config.js';
 
 
 export const LoginController = async(req,res,next) =>{
+    /**
+     * Takes email and password in request body and find the data using findOne query 
+     * provided by sequelize, if there is user
+     * Again check if provided password is correct or not using bcrypt compare function
+     * if password is validated, authorization is provided otherwise unauthorized message
+     * is sent to user.
+     */
     try{
         const {email,password} = req.body;
         const user = await User.findOne({where:{email:email,},include:Role});
