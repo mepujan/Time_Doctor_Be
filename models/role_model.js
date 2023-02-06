@@ -1,7 +1,7 @@
 import { Model,DataTypes} from "sequelize";
 import { sequelize } from "../sequelize_connection.js";
 
-
+// defining the table name and columns name of database using sequelize
 class Role extends Model{}
 export default Role.init({
     id:{
