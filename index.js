@@ -15,8 +15,8 @@ const PORT = config.port;
 
 app.use('/images',express.static('images'));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use(router);
 app.use(user_router);
 app.use(auth_router);
