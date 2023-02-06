@@ -7,6 +7,6 @@ export const ProfilePictureStorage = multer.diskStorage({
         cb(null,'images/profile_picture');
     },
     filename:(req,file,cb)=>{
-        cb(null,Date.now() + path.extname(file.originalname))
+        cb(null,Date.now()+'_time_doctor' + path.extname(file.originalname))
     }
 })
