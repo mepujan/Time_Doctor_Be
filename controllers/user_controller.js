@@ -17,7 +17,6 @@ export const createUser = async(req,res,next) =>{
     try{
         const {password} = req.body;
         const user = User.build(req.body);
-        console.log(req.file);
         const hash_password = await bcrypt.hash(password,10);
         user.password = hash_password;
         user.profile_image = path.join(config.host,req.file.path);
