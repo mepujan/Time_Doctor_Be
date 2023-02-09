@@ -39,8 +39,8 @@ export const updateUser = async(req,res,next) => {
         const updatedUser = await User.update({first_name: req.body.first_name, middle_name: req.body.middle_name, last_name: req.body.last_name, email: req.body.email, user_name: req.body.user_name, mobile_number: req.body.mobile_number, address: req.body.address, dob: req.body.dob, gender: req.body.gender, blood_group: req.body.blood_group, role_id: req.body.rold_id},{where:{id: req.params.id}});
         const {email,mobile_number} = req.body;
         if(updatedUser > 0){
-            sendmail(email);
-            sendSMS(mobile_number);
+            sendmail(email,"Account Update","Account Updated Successfully");
+            sendSMS(mobile_number,"Account Updated Successfully");
         }
        
         return res.status(200).json({"message":"User Account is Updated"});
@@ -52,16 +52,19 @@ export const updateUser = async(req,res,next) => {
 
 
 export const updatePassword = async(req,res,next)=>{
+    // update user password
     try{
         let token = req.headers.authorization;
         if(token){
             token = token.split(' ')[1];
             let user = jwt.verify(token,config.jwt_secret_key);
-            const {id} = user;
+            const {id,mobile,email} = user;
             const {password} = req.body;
             const newHashPassword = await bcrypt.hash(password,10);
             const updatedPassword = await User.update({password:newHashPassword},{where:{id:id}});
             if(updatedPassword){
+                sendmail(email,"Password Update","Password Updated Successfully");
+                sendSMS(mobile,"Password Updated Successfully");
                 return res.status(201).json({"message":"Password Updated Successfully."});
             }
             else{
@@ -73,6 +76,7 @@ export const updatePassword = async(req,res,next)=>{
         }
 
     }catch(e){
+        console.log(e);
         next(e);
     }
 

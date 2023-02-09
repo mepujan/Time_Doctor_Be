@@ -5,9 +5,9 @@ import twilio from 'twilio';
 
 const client = twilio(accountSid,authToken);
 
-export const sendSMS = (mobile_num) =>{
+export const sendSMS = (mobile_num,message) =>{
     client.messages
-    .create({ body: "Your Time Doctor Account has been Updated.", from: "+13856449138", to: mobile_num })
+    .create({ body: message, from: "+13856449138", to: mobile_num })
     .then(message => console.log(message.sid));
 }
 
