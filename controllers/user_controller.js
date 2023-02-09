@@ -49,3 +49,31 @@ export const updateUser = async(req,res,next) => {
     }
 }
 
+
+
+export const updatePassword = async(req,res,next)=>{
+    try{
+        let token = req.headers.authorization;
+        if(token){
+            token = token.split(' ')[1];
+            let user = jwt.verify(token,config.jwt_secret_key);
+            const {id} = user;
+            const {password} = req.body;
+            const newHashPassword = await bcrypt.hash(password,10);
+            const updatedPassword = await User.update({password:newHashPassword},{where:{id:id}});
+            if(updatedPassword){
+                return res.status(201).json({"message":"Password Updated Successfully."});
+            }
+            else{
+                return res.status(500).json({"message":"Cannot Update Password."});
+            }
+
+        }else{
+            return res.status(401).json({"message":"Unauthorized User"});
+        }
+
+    }catch(e){
+        next(e);
+    }
+
+}

@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser,updateUser } from "../controllers/user_controller.js";
+import { createUser,updatePassword,updateUser } from "../controllers/user_controller.js";
 import { ProfilePictureStorage } from "../middlewares/image_handler.js";
 import multer from "multer";
 
@@ -11,5 +11,8 @@ user_router.post("/api/createUser",profile_pic_upload.single("profile_image"),cr
 
 //user update route
 user_router.put("/api/updateUser/:id",updateUser);
+
+//update password
+user_router.put("/api/updatePassword",updatePassword)
 
 export default user_router;
