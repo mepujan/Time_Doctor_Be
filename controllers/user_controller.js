@@ -21,7 +21,7 @@ export const createUser = async(req,res,next) =>{
         user.password = hash_password;
         user.profile_image = path.join(config.host,req.file.path);
         const result = await user.save();
-        const token = jwt.sign({email: result.email, id: result.id, username: result.user_name},config.jwt_secret_key);
+        const token = jwt.sign({email: result.email, id: result.id, username: result.user_name,mobile:result.mobile_number},config.jwt_secret_key);
         return res.status(201).json({"message":"User Account Created Successfully.",result,token});
 
     }catch(e){
@@ -36,7 +36,7 @@ export const updateUser = async(req,res,next) => {
      * to notify the user about the change has been done.
      */
     try {        
-        const updatedUser = await User.update({first_name: req.body.first_name, middle_name: req.body.middle_name, last_name: req.body.last_name, email: req.body.email, user_name: req.body.user_name, mobile_number: req.body.mobile_number, address: req.body.address, dob: req.body.dob, gender: req.body.gender, blood_group: req.body.blood_group, role_id: req.body.rold_id},{where:{id: req.params.id}});
+        const updatedUser = await User.update({first_name: req.body.first_name, middle_name: req.body.middle_name, last_name: req.body.last_name, email: req.body.email, user_name: req.body.user_name, mobile_number: req.body.mobile_number, address: req.body.address, dob: req.body.dob, gender: req.body.gender, blood_group: req.body.blood_group, role_id: req.body.rold_id},{where:{id: req.id}});
         const {email,mobile_number} = req.body;
         if(updatedUser > 0){
             sendmail(email,"Account Update","Account Updated Successfully");
@@ -54,14 +54,10 @@ export const updateUser = async(req,res,next) => {
 export const updatePassword = async(req,res,next)=>{
     // update user password
     try{
-        let token = req.headers.authorization;
-        if(token){
-            token = token.split(' ')[1];
-            let user = jwt.verify(token,config.jwt_secret_key);
-            const {id,mobile,email} = user;
-            const {password} = req.body;
-            const newHashPassword = await bcrypt.hash(password,10);
-            const updatedPassword = await User.update({password:newHashPassword},{where:{id:id}});
+        const {password} = req.body;
+        const {id,mobile,email} = req;
+        const newHashPassword = await bcrypt.hash(password,10);
+        const updatedPassword = await User.update({password:newHashPassword},{where:{id:id}});
             if(updatedPassword){
                 sendmail(email,"Password Update","Password Updated Successfully");
                 sendSMS(mobile,"Password Updated Successfully");
@@ -70,11 +66,6 @@ export const updatePassword = async(req,res,next)=>{
             else{
                 return res.status(500).json({"message":"Cannot Update Password."});
             }
-
-        }else{
-            return res.status(401).json({"message":"Unauthorized User"});
-        }
-
     }catch(e){
         console.log(e);
         next(e);
