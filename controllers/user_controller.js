@@ -72,3 +72,14 @@ export const updatePassword = async(req,res,next)=>{
     }
 
 }
+
+
+export const getLoggedInUserDetail = async(req,res,next) =>{
+    try{
+        const {id} = req;
+        const userDetail = await User.findByPk(id);
+        return res.status(200).json(userDetail);
+    }catch(e){
+        next(e)
+    }
+}

@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser,updatePassword,updateUser } from "../controllers/user_controller.js";
+import { createUser,updatePassword,updateUser,getLoggedInUserDetail } from "../controllers/user_controller.js";
 import { ProfilePictureStorage } from "../middlewares/image_handler.js";
 import multer from "multer";
 import { LoginRequired } from "../middlewares/login_required.js";
@@ -15,5 +15,7 @@ user_router.put("/api/updateUser",LoginRequired,updateUser);
 
 //update password
 user_router.put("/api/updatePassword",LoginRequired,updatePassword)
+
+user_router.get("/api/getLoggedInUser",LoginRequired,getLoggedInUserDetail);
 
 export default user_router;

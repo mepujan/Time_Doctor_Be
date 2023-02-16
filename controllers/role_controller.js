@@ -12,3 +12,13 @@ export const createRole = async(req,res,next) =>{
         next(e);
     }
 }
+
+
+export const getRole = async(req,res,next) =>{
+    try{
+        const roles = await Role.findAll({attributes:{exclude:['createdAt','updatedAt']},});
+        return res.status(201).json(roles);
+    }catch(e){
+        next(e);
+    }
+}
