@@ -6,7 +6,7 @@ import { sendSMS } from '../sendSMS.js';
 export const sendNotificationAsRole = async(req,res,next) =>{
     /** send email and sms notification to user as per the roles defined in url params */
     try{
-        const {role} = req.params;
+        const {role} = req.params
         const {subject,message} = req.body;
         const userEmails = [];
         const userMobile = [];
