@@ -6,6 +6,7 @@ import { ErrorHandler } from './middlewares/error_handler.js';
 import { config } from './configurations/config.js';
 import { sequelize } from './sequelize_connection.js';
 import cors from 'cors';
+import notificationRouter from './routes/notificationRouter.js';
 
 
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(router);
 app.use(user_router);
 app.use(auth_router);
+app.use(notificationRouter)
 app.use(ErrorHandler);
 
 const Start = async() =>{
