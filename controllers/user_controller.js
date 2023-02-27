@@ -19,7 +19,7 @@ export const createUser = async(req,res,next) =>{
         const user = User.build(req.body);
         const hash_password = await bcrypt.hash(password,10);
         user.password = hash_password;
-        user.profile_image = path.join(config.host,req.file.path);
+        user.profile_image = path.join(`${config.host}:${config.port}`,req.file.path);
         const result = await user.save();
         const token = jwt.sign({email: result.email, id: result.id, username: result.user_name,mobile:result.mobile_number},config.jwt_secret_key);
         return res.status(201).json({"message":"User Account Created Successfully.",result,token});

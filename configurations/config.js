@@ -8,7 +8,7 @@ dotenv.config();
  * available from there.
  */
 export const config = {
-    db_host_name: process.env.Host,
+    db_host_name: process.env.DB_Host,
     db_user_name: process.env.User,
     db_password: process.env.Password,
     db_name : process.env.DB_Name,
@@ -16,6 +16,6 @@ export const config = {
     twilio_auth_token:process.env.TWILIO_AUTH_TOKEN,
     twilio_account_sid : process.env.Account_sid,
     jwt_secret_key: process.env.Secret_Key,
-    host: process.env.Server_Host,
+    host: process.env.Host,
     port: process.env.Port
 }
