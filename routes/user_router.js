@@ -3,6 +3,7 @@ import { createUser,updatePassword,updateUser,getLoggedInUserDetail,getAllUserBy
 import { ProfilePictureStorage } from "../middlewares/image_handler.js";
 import multer from "multer";
 import { LoginRequired } from "../middlewares/login_required.js";
+import { getEvents,addEvents } from "../controllers/calendarController.js";
 
 const user_router = express.Router();
 const profile_pic_upload = multer({storage:ProfilePictureStorage});
@@ -17,6 +18,7 @@ user_router.put("/api/updateUser",LoginRequired,updateUser);
 user_router.put("/api/updatePassword",LoginRequired,updatePassword)
 
 user_router.get("/api/getLoggedInUser",LoginRequired,getLoggedInUserDetail);
-user_router.get("/api/getUsersByRole/:role",LoginRequired,getAllUserByRole)
+user_router.get("/api/getUsersByRole/:role",LoginRequired,getAllUserByRole);
+
 
 export default user_router;
