@@ -22,7 +22,7 @@ export const sendNotificationAsRole = async(req,res,next) =>{
             sendSMS(userMobile,`${subject} 
              ${message}`)
         }
-        return res.status(200).json({"message":"Notification send"});
+        return res.status(200).json({"success":"Notification Send Successfully"});
     }catch(err){
         next(err);
     }

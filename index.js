@@ -2,13 +2,12 @@ import express from 'express';
 import router from './routes/role_router.js';
 import user_router from './routes/user_router.js';
 import auth_router from './routes/auth_router.js';
+import scheduleRouter from './routes/scheduleRouter.js';
 import { ErrorHandler } from './middlewares/error_handler.js';
 import { config } from './configurations/config.js';
 import { sequelize } from './sequelize_connection.js';
 import cors from 'cors';
 import notificationRouter from './routes/notificationRouter.js';
-
-
 
 const app = express();
 app.use(cors());
@@ -21,7 +20,8 @@ app.use(express.urlencoded({extended:true}));
 app.use(router);
 app.use(user_router);
 app.use(auth_router);
-app.use(notificationRouter)
+app.use(notificationRouter);
+app.use(scheduleRouter);
 app.use(ErrorHandler);
 
 const Start = async() =>{
