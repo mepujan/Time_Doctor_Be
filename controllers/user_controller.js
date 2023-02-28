@@ -1,4 +1,5 @@
 import User from '../models/user_model.js';
+import Role from '../models/role_model.js';
 import { sendmail } from '../sendemail.js';
 import { sendSMS } from '../sendSMS.js';
 import { config } from '../configurations/config.js';
@@ -19,7 +20,8 @@ export const createUser = async(req,res,next) =>{
         const user = User.build(req.body);
         const hash_password = await bcrypt.hash(password,10);
         user.password = hash_password;
-        user.profile_image = path.join(`${config.host}:${config.port}`,req.file.path);
+        let webPath = req.file.path.replace(/\\/g,'/');
+        user.profile_image = path.join(`${config.host}:${config.port}`,webPath);
         const result = await user.save();
         const token = jwt.sign({email: result.email, id: result.id, username: result.user_name,mobile:result.mobile_number},process.env.Secret_Key);
         return res.status(201).json({"message":"User Account Created Successfully.",result,token});
@@ -81,5 +83,36 @@ export const getLoggedInUserDetail = async(req,res,next) =>{
         return res.status(200).json(userDetail);
     }catch(e){
         next(e)
+    }
+}
+
+
+export const getAllUserByRole = async(req,res,next) =>{
+    try{
+        const {role} = req.params;
+        const getRoleIdFromName = await Role.findOne({
+            where:{
+                name :role
+            },
+            attributes:['id']
+        });
+        
+
+        // return res.send(getRoleIdFromName);
+       
+        if (getRoleIdFromName){
+            const {id} = getRoleIdFromName;
+            const users = await User.findAll({
+                where:{
+                    role_id : id
+                }
+            });
+            return res.status(200).json(users);
+        }
+        return res.status(404).json({"message":"Users not found"})
+        
+    }catch(err){
+        console.log(err);
+        next(err);
     }
 }
