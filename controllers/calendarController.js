@@ -3,8 +3,11 @@ import fs from 'fs/promises';
 import path from 'path';
 import process from 'process';
 import { authenticate } from '@google-cloud/local-auth';
-import {google} from 'googleapis';
-
+import { google } from 'googleapis';
+import moment from 'moment';
+import User from '../models/user_model.js';
+import { sendmail } from '../sendemail.js';
+import { sendSMS } from '../sendSMS.js';
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -71,7 +74,7 @@ async function authorize() {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: 'v3', auth });
   const res = await calendar.events.list({
     calendarId: 'primary',
     timeMin: new Date().toISOString(),
@@ -84,64 +87,82 @@ async function listEvents(auth) {
     console.log('No upcoming events found.');
     return;
   }
-  // console.log(events);
   return events;
 }
 
-export const getEvents = async (req,res,next) =>{
-    const events = await authorize().then(listEvents).catch(console.error);
-    return res.status(200).json(events);
+export const getEvents = async (req, res, next) => {
+  const events = await authorize().then(listEvents).catch(console.error);
+  return res.status(200).json(events);
 }
 
-const addEvent = (auth,data) =>{
-  const {startDateTime,endDateTime} = data;
+const addEvent = (auth, data, patient, doctor) => {
+  let { start_date, end_date } = data;
+  start_date = moment.utc(start_date).local().format();
+  end_date = moment.utc(end_date).local().format()
+
   const event = {
     'summary': 'Surgery Schedule',
     'location': '89 Norman St, Sarnia, ON N7T 6S3',
     'description': 'Your Surgery Has been Scheduled.',
     'start': {
-      'dateTime': startDateTime,
-      'timeZone': 'America/Los_Angeles',
+      'dateTime': start_date,
+      'timeZone': 'America/Toronto',
     },
     'end': {
-      'dateTime': endDateTime,
-      'timeZone':'America/Los_Angeles',
+      'dateTime': end_date,
+      'timeZone': 'America/Toronto',
     },
 
     'attendees': [
-      {'email': 'lpage@example.com'},
-      {'email': 'sbrin@example.com'},
+      { 'email': patient.email },
+      { 'email': doctor.email },
     ],
     'reminders': {
       'useDefault': false,
       'overrides': [
-        {'method': 'email', 'minutes': 24 * 60},
-        {'method': 'popup', 'minutes': 10},
+        { 'method': 'email', 'minutes': 24 * 60 },
+        { 'method': 'popup', 'minutes': 10 },
       ],
     },
   };
-  const calendar = google.calendar({version: 'v3', auth});
+
+  var time = new Date(start_date)
+  const formatted_time = time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+  const message = `Hi ${patient.user_name}
+  Your Surgery has been scheduled at Bluewater Health
+  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time} 
+  
+  Regards,
+  Time Doctor
+  `;
+
+  const html = `<strong> Hi ${patient.user_name} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+
+  const subject = "Surgery Scheduled Successfully";
+  const calendar = google.calendar({ version: 'v3', auth });
   calendar.events.insert({
     auth: auth,
     calendarId: 'primary',
     resource: event,
-  }, function(err, event) {
+  }, function (err, event) {
     if (err) {
       console.log('There was an error contacting the Calendar service: ' + err);
       return;
     }
+    sendmail([patient.email, doctor.email], subject, html);
+    sendSMS([patient.mobile_number, doctor.mobile_number], message);
     return true
   });
 }
 
-export const addEvents = (req,res,next) =>{
-  const data = {
-    "startDateTime":"2023-03-1T09:00:00-07:00",
-    "endDateTime":"2023-03-1T17:00:00-07:00"
+export const addEvents = async (req, res, next) => {
+  const data = req.body;
+  const { patient, doctor } = req.body;
+  const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
+  const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
+  const isAdded = authorize().then((value) => addEvent(value, data, patient_data, doctor_data)).catch(console.error);
+  if (isAdded) {
+    return res.status(200).json({ message: "Event Added Successfully" });
   }
-  const isAdded = authorize().then((value)=>addEvent(value,data)).catch(console.error);
-  if(isAdded){
-    return res.status(200).json({message:"Event Added Successfully"});
-  }
-  return res.status(500).json({message:"Something went wrong"})
+  return res.status(500).json({ message: "Something went wrong" })
 }
