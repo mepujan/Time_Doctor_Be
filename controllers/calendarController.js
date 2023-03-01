@@ -97,9 +97,9 @@ export const getEvents = async (req, res, next) => {
 
 const addEvent = (auth, data, patient, doctor) => {
   let { start_date, end_date } = data;
-  start_date = moment.utc(start_date).local().format();
-  end_date = moment.utc(end_date).local().format()
-
+  start_date = new Date(start_date);
+  end_date = new Date(end_date);
+  
   const event = {
     'summary': 'Surgery Schedule',
     'location': '89 Norman St, Sarnia, ON N7T 6S3',

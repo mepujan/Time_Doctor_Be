@@ -13,6 +13,7 @@ import notificationRouter from './routes/notificationRouter.js';
 const app = express();
 app.use(cors());
 const PORT = config.port;
+process.env.TZ = "America/Toronto";
 
 app.use('/images',express.static('images'));
 
