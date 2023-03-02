@@ -1,10 +1,8 @@
-
 import fs from 'fs/promises';
 import path from 'path';
 import process from 'process';
 import { authenticate } from '@google-cloud/local-auth';
 import { google } from 'googleapis';
-import moment from 'moment';
 import User from '../models/user_model.js';
 import { sendmail } from '../sendemail.js';
 import { sendSMS } from '../sendSMS.js';
@@ -99,7 +97,7 @@ const addEvent = (auth, data, patient, doctor) => {
   let { start_date, end_date } = data;
   start_date = new Date(start_date);
   end_date = new Date(end_date);
-  
+
   const event = {
     'summary': 'Surgery Schedule',
     'location': '89 Norman St, Sarnia, ON N7T 6S3',
