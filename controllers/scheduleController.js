@@ -1,5 +1,17 @@
 import Surgery from '../models/surgery_model.js';
 
+
+export const saveSchedule = async(req,res,next) =>{
+    try{
+        const data = req.data;
+        const newSchedule = await Surgery.create(data);
+        return res.status(201).json({message:"Schedule Saved Successfully.",newSchedule});
+    }
+    catch(e){
+        next(e);
+    }
+}
+
 export const getScheduledData = async(req,res,next) =>{
     // returns the list of scheduled data of the logged in user.
     try{
