@@ -93,6 +93,54 @@ export const getEvents = async (req, res, next) => {
   return res.status(200).json(events);
 }
 
+
+
+const updateEvent = async(auth, newEvent) => {
+  let { start_date, end_date,eventId } = newEvent;
+  start_date = new Date(start_date);
+  end_date = new Date(end_date);
+
+  const event = {
+    'start': {
+      'dateTime': start_date,
+      'timeZone': 'America/Toronto',
+    },
+    'end': {
+      'dateTime': end_date,
+      'timeZone': 'America/Toronto',
+    },
+  }
+
+
+
+  
+  try {
+    const calendar = google.calendar({ version: 'v3', auth });
+    const response = await calendar.events.get({
+      calendarId:'primary',
+      eventId:eventId
+    });
+
+    
+    const formatted_time = start_date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+    const html_patient = `<strong> Hi ${response.data.attendees[1].email.split('@')[0]} <br/>Your Surgery has been re-scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+    const html_doctor = `<strong> Hi Dr. ${response.data.attendees[0].email.split('@')[0]} <br/>Your Surgery has been re-scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+    const subject = "Surgery Rescheduled";
+    calendar.events.patch({
+      calendarId: 'primary',
+      eventId: eventId,
+      requestBody:event
+    });
+    console.log(response.data.attendees[0].email)
+    sendmail(response.data.attendees[0].email, subject, html_doctor);
+    sendmail(response.data.attendees[1].email,subject,html_patient);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
+
 const addEvent = (auth, data, patient, doctor) => {
   let { start_date, end_date } = data;
   start_date = new Date(start_date);
@@ -133,8 +181,8 @@ const addEvent = (auth, data, patient, doctor) => {
   Regards,
   Time Doctor
   `;
-
-  const html = `<strong> Hi ${patient.user_name} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+  const html_patient = `<strong> Hi ${response.data.attendees[1].email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+  const html_doctor = `<strong> Hi Dr. ${response.data.attendees[0].email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
 
   const subject = "Surgery Scheduled Successfully";
   const calendar = google.calendar({ version: 'v3', auth });
@@ -147,7 +195,8 @@ const addEvent = (auth, data, patient, doctor) => {
       console.log('There was an error contacting the Calendar service: ' + err);
       return;
     }
-    sendmail([patient.email, doctor.email], subject, html);
+    sendmail(patient.email, subject, html_patient);
+    sendmail(doctor.email,subject,html_doctor);
     sendSMS([patient.mobile_number, doctor.mobile_number], message);
     return true
   });
@@ -163,4 +212,14 @@ export const addEvents = async (req, res, next) => {
     return res.status(200).json({ message: "Event Added Successfully" });
   }
   return res.status(500).json({ message: "Something went wrong" })
+}
+
+
+export const rescheduleEvent = (req,res,next)=>{
+  const newEvent = req.body;
+  const isUpdated = authorize().then((value)=>updateEvent(value,newEvent)).catch(console.error)
+  if(isUpdated){
+    return res.status(200).json({"message":"Schedule Updated Successfully"});
+  }
+  return res.status(500).json({"message":"Cannot Update the Schedule"});
 }
