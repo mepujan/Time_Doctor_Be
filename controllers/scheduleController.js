@@ -1,4 +1,25 @@
 import Surgery from '../models/surgery_model.js';
+import SurgeryType from '../models/surgery_types.js';
+
+
+export const createNewSurgeryType = async(req,res,next) =>{
+    try{
+        const newType = await SurgeryType.create(req.body);
+        return res.status(201).json({message:"Surgery Type has added.",newType});
+
+    }catch(e){
+        next(e)
+    }
+}
+
+export const getAllSurgeryTypes = async(req,res,next) =>{
+    try{
+        const types = await SurgeryType.findAll({});
+        return res.status(200).json(types);
+    }catch(e){
+        next(e);
+    }
+}
 
 
 export const saveSchedule = async(req,res,next) =>{
