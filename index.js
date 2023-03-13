@@ -4,6 +4,7 @@ import user_router from './routes/user_router.js';
 import auth_router from './routes/auth_router.js';
 import scheduleRouter from './routes/scheduleRouter.js';
 import calendarRoute from './routes/calendarRoute.js';
+import questionariesRoute from './routes/questionariesRoute.js';
 import { ErrorHandler } from './middlewares/error_handler.js';
 import { config } from './configurations/config.js';
 import { sequelize } from './sequelize_connection.js';
@@ -25,6 +26,7 @@ app.use(auth_router);
 app.use(notificationRouter);
 app.use(scheduleRouter);
 app.use(calendarRoute);
+app.use(questionariesRoute);
 app.use(ErrorHandler);
 
 const Start = async() =>{
