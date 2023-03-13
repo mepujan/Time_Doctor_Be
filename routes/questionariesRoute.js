@@ -3,8 +3,8 @@ import { createNewQuestion,createNewQuestionType,saveAnswers } from "../controll
 
 const questionariesRoute = express.Router();
 
-questionariesRoute.post("/addQuestionType",createNewQuestionType);
-questionariesRoute.post("/addNewQuestion",createNewQuestion);
-questionariesRoute.post("/savaAnswer",saveAnswers);
+questionariesRoute.post("/api/addQuestionType",createNewQuestionType);
+questionariesRoute.post("/api/addQuestion",createNewQuestion);
+questionariesRoute.post("/api/saveAnswer",saveAnswers);
 
 export default questionariesRoute;

@@ -4,7 +4,7 @@ import Question from "../models/question_model.js";
 
 export const createNewQuestionType = async(req, res, next) =>{
     try{
-        const newType = await QuestionType.create(res.body);
+        const newType = await QuestionType.create(req.body);
         return res.status(201).json(newType);
     }catch(e){
         next(e);
