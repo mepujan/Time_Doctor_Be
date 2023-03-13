@@ -16,7 +16,8 @@ export default Surgery.init({
         references:{
             model:"users",
             key:"id"
-        }
+        },
+        allowNull:false
     },
     start_date:{
         type:DataTypes.DATE,
@@ -31,7 +32,18 @@ export default Surgery.init({
         references:{
             model:"users",
             key:"id"
-        }
+        },
+        allowNull:false
+    },
+    status :{
+        type:DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull:false
+    },
+    important:{
+        type:DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull:false
     }
 },{
     sequelize,
