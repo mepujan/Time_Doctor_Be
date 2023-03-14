@@ -7,5 +7,5 @@ export const ErrorHandler = (err, req, res, next) => {
     res.status(errStatus).json({
         success: false,
         status: errStatus,
-        message: errMsg[0].message
+        message: err
 })}

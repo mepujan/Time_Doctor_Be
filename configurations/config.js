@@ -7,6 +7,7 @@ dotenv.config();
  * so that it can be maintained easily placing it in one place and making them
  * available from there.
  */
+
 export const config = {
     db_host_name: process.env.DB_Host,
     db_user_name: process.env.User,

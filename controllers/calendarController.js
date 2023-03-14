@@ -102,6 +102,7 @@ const addEvent = (auth, data, patient, doctor) => {
     'summary': 'Surgery Schedule',
     'location': '89 Norman St, Sarnia, ON N7T 6S3',
     'description': 'Your Surgery Has been Scheduled.',
+    'colorId':11,
     'start': {
       'dateTime': start_date,
       'timeZone': 'America/Toronto',
