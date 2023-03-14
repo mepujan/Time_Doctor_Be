@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { authenticate } from '@google-cloud/local-auth';
@@ -93,8 +93,6 @@ export const getEvents = async (req, res, next) => {
   return res.status(200).json(events);
 }
 
-
-
 const updateEvent = async(auth, newEvent) => {
   let { start_date, end_date,eventId } = newEvent;
   start_date = new Date(start_date);
@@ -111,9 +109,6 @@ const updateEvent = async(auth, newEvent) => {
     },
   }
 
-
-
-  
   try {
     const calendar = google.calendar({ version: 'v3', auth });
     const response = await calendar.events.get({
@@ -223,3 +218,41 @@ export const rescheduleEvent = (req,res,next)=>{
   }
   return res.status(500).json({"message":"Cannot Update the Schedule"});
 }
+
+
+//import code
+
+import csv from 'csv-parser';
+import neatCsv from 'neat-csv';
+
+
+export const updateEventFromFile = async (req, res, next) => {
+  try {
+    fs.createReadStream(req.file.path)
+  .pipe(csv())
+  .on('data',async (row) => {
+    // Process each row of data
+    console.log(row);
+    const { patient, doctor } = row;
+    const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
+    const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
+    const isAdded = authorize().then((value) => addEvent(value, row, patient_data, doctor_data)).catch(console.error);
+    if (isAdded) {
+      return res.status(200).json({ message: "Event Added Successfully" });
+    }
+      return res.status(500).json({ message: "Something went wrong" })
+
+  })
+  .on('end', () => {
+    // All rows have been processed
+    console.log('done');
+    res.status(201).json({message: 'All events added successfully'});
+  });
+  }
+  catch (err){
+      console.error(err);
+      next(err);
+  }
+}
+
+

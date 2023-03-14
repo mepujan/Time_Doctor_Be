@@ -23,7 +23,7 @@ export const createUser = async(req,res,next) =>{
         let webPath = req.file.path.replace(/\\/g,'/');
         user.profile_image = path.join(`${config.host}:${config.port}`,webPath);
         const result = await user.save();
-        const token = jwt.sign({email: result.email, id: result.id, username: result.user_name,mobile:result.mobile_number},config.jwt_secret_key);
+        const token = jwt.sign({email: result.email, id: result.id, username: result.user_name,mobile:result.mobile_number},process.env.Secret_Key);
         return res.status(201).json({"message":"User Account Created Successfully.",result,token});
 
     }catch(e){
