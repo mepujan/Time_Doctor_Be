@@ -7,6 +7,9 @@ import User from '../models/user_model.js';
 import { sendmail } from '../sendemail.js';
 import { sendSMS } from '../sendSMS.js';
 import { saveSchedule } from './scheduleController.js';
+import csv from 'csv-parser';
+import csvParser from 'fs';
+
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -127,7 +130,7 @@ const updateEvent = async(auth, newEvent) => {
       eventId: eventId,
       requestBody:event
     });
-    console.log(response.data.attendees[0].email)
+
     sendmail(response.data.attendees[0].email, subject, html_doctor);
     sendmail(response.data.attendees[1].email,subject,html_patient);
     return true;
@@ -177,8 +180,8 @@ const addEvent = (auth, data, patient, doctor) => {
   Regards,
   Time Doctor
   `;
-  const html_patient = `<strong> Hi ${response.data.attendees[1].email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
-  const html_doctor = `<strong> Hi Dr. ${response.data.attendees[0].email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+  const html_patient = `<strong> Hi ${patient.email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
+  const html_doctor = `<strong> Hi Dr. ${doctor.email.split('@')[0]} <br/>Your Surgery has been scheduled in Bluewater Health at  ${JSON.stringify(start_date).slice(1, 11)} at ${formatted_time}<br/>Regards,<br/>Time Doctor`;
 
   const subject = "Surgery Scheduled Successfully";
   const calendar = google.calendar({ version: 'v3', auth });
@@ -186,7 +189,7 @@ const addEvent = (auth, data, patient, doctor) => {
     auth: auth,
     calendarId: 'primary',
     resource: event,
-  }, function (err, event) {
+  }, function (err) {
     if (err) {
       console.log('There was an error contacting the Calendar service: ' + err);
       return;
@@ -201,12 +204,11 @@ const addEvent = (auth, data, patient, doctor) => {
 export const addEvents = async (req, res, next) => {
   const data = req.body;
   const { patient, doctor } = req.body;
-  
   const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
   const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
   const isAdded = authorize().then((value) => addEvent(value, data, patient_data, doctor_data)).catch(console.error);
-  const dataSaved = saveSchedule(data);
-  if (isAdded && dataSaved) {
+  // const dataSaved = saveSchedule(data);
+  if (isAdded) {
     return res.status(200).json({ message: "Event Added Successfully" });
   }
   return res.status(500).json({ message: "Something went wrong" })
@@ -225,36 +227,23 @@ export const rescheduleEvent = (req,res,next)=>{
 
 //import code
 
-// import csv from 'csv-parser';
-
-
-// export const updateEventFromFile = async (req, res, next) => {
-//   try {
-//     fs.createReadStream(req.file.path)
-//   .pipe(csv())
-//   .on('data',async (row) => {
-//     // Process each row of data
-//     console.log(row);
-//     const { patient, doctor } = row;
-//     const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
-//     const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
-//     const isAdded = authorize().then((value) => addEvent(value, row, patient_data, doctor_data)).catch(console.error);
-//     if (isAdded) {
-//       return res.status(200).json({ message: "Event Added Successfully" });
-//     }
-//       return res.status(500).json({ message: "Something went wrong" })
-
-//   })
-//   .on('end', () => {
-//     // All rows have been processed
-//     console.log('done');
-//     res.status(201).json({message: 'All events added successfully'});
-//   });
-//   }
-//   catch (err){
-//       console.error(err);
-//       next(err);
-//   }
-// }
+export const updateEventFromFile = async (req, res, next) => {
+  try {
+    csvParser.createReadStream(req.file.path)
+  .pipe(csv())
+  .on('data',async (row) => {
+    const { patient, doctor } = row;
+    const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
+    const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
+    authorize().then((value) => addEvent(value, row, patient_data, doctor_data)).catch(console.error);
+  })
+  .on('end', () => {
+    res.status(201).json({message: 'All events added successfully'});
+  });
+  }
+  catch (err){
+      next(err);
+  }
+}
 
 

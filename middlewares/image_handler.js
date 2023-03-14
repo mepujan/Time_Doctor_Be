@@ -9,4 +9,13 @@ export const ProfilePictureStorage = multer.diskStorage({
     filename:(req,file,cb)=>{
         cb(null,Date.now()+'_time_doctor' + path.extname(file.originalname))
     }
+});
+
+export const CSVFileStorage = multer.diskStorage({
+    destination: (req,file,cb)=>{
+        cb(null,'images/csv');
+    },
+    filename:(req,file,cb)=>{
+        cb(null,Date.now()+'_time_doctor' + path.extname(file.originalname))
+    }
 })
