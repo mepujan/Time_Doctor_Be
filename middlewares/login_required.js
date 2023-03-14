@@ -11,6 +11,7 @@ export const LoginRequired = async(req,res, next) => {
                 req.id = user.id;
                 req.email = user.email;
                 req.mobile = user.mobile;
+                req.user_name = user.user_name;
             }else{
                 return res.status(401).json({message:"Unauthorized User"});
             }

@@ -1,5 +1,6 @@
 import { Model,DataTypes} from "sequelize";
 import { sequelize } from "../sequelize_connection.js";
+import surgeryTypes from "./surgery_types.js";
 import User from './user_model.js';
 
 
@@ -52,4 +53,5 @@ export default Surgery.init({
     modelName: 'surgery'
   });
 Surgery.belongsTo(User);
+Surgery.belongsTo(surgeryTypes)
 Surgery.sync();

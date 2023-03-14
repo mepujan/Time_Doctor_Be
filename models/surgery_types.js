@@ -22,7 +22,6 @@ export default SurgeryType.init({
     timestamps: true,
     modelName: 'surgeryTypes'
 });
-SurgeryType.hasOne(surgery_model); // foreign key added to surgery_model table
 SurgeryType.sync();
 
 

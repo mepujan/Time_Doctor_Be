@@ -1,6 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../sequelize_connection.js";
-import Question from "./questionType_model.js";
+import Question from "./question_model.js";
+import User from './user_model.js';
 
 class Answer extends Model{}
 export default Answer.init({
@@ -21,4 +22,5 @@ export default Answer.init({
     modelName: 'answer'
   });
 Answer.belongsTo(Question)
-  Answer.sync();
+Answer.belongsTo(User)
+Answer.sync();

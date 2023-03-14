@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import process from 'process';
 import { authenticate } from '@google-cloud/local-auth';
@@ -6,6 +6,7 @@ import { google } from 'googleapis';
 import User from '../models/user_model.js';
 import { sendmail } from '../sendemail.js';
 import { sendSMS } from '../sendSMS.js';
+import { saveSchedule } from './scheduleController.js';
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -200,10 +201,12 @@ const addEvent = (auth, data, patient, doctor) => {
 export const addEvents = async (req, res, next) => {
   const data = req.body;
   const { patient, doctor } = req.body;
+  
   const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
   const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
   const isAdded = authorize().then((value) => addEvent(value, data, patient_data, doctor_data)).catch(console.error);
-  if (isAdded) {
+  const dataSaved = saveSchedule(data);
+  if (isAdded && dataSaved) {
     return res.status(200).json({ message: "Event Added Successfully" });
   }
   return res.status(500).json({ message: "Something went wrong" })
@@ -222,37 +225,36 @@ export const rescheduleEvent = (req,res,next)=>{
 
 //import code
 
-import csv from 'csv-parser';
-import neatCsv from 'neat-csv';
+// import csv from 'csv-parser';
 
 
-export const updateEventFromFile = async (req, res, next) => {
-  try {
-    fs.createReadStream(req.file.path)
-  .pipe(csv())
-  .on('data',async (row) => {
-    // Process each row of data
-    console.log(row);
-    const { patient, doctor } = row;
-    const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
-    const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
-    const isAdded = authorize().then((value) => addEvent(value, row, patient_data, doctor_data)).catch(console.error);
-    if (isAdded) {
-      return res.status(200).json({ message: "Event Added Successfully" });
-    }
-      return res.status(500).json({ message: "Something went wrong" })
+// export const updateEventFromFile = async (req, res, next) => {
+//   try {
+//     fs.createReadStream(req.file.path)
+//   .pipe(csv())
+//   .on('data',async (row) => {
+//     // Process each row of data
+//     console.log(row);
+//     const { patient, doctor } = row;
+//     const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
+//     const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
+//     const isAdded = authorize().then((value) => addEvent(value, row, patient_data, doctor_data)).catch(console.error);
+//     if (isAdded) {
+//       return res.status(200).json({ message: "Event Added Successfully" });
+//     }
+//       return res.status(500).json({ message: "Something went wrong" })
 
-  })
-  .on('end', () => {
-    // All rows have been processed
-    console.log('done');
-    res.status(201).json({message: 'All events added successfully'});
-  });
-  }
-  catch (err){
-      console.error(err);
-      next(err);
-  }
-}
+//   })
+//   .on('end', () => {
+//     // All rows have been processed
+//     console.log('done');
+//     res.status(201).json({message: 'All events added successfully'});
+//   });
+//   }
+//   catch (err){
+//       console.error(err);
+//       next(err);
+//   }
+// }
 
 

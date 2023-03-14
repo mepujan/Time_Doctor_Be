@@ -1,5 +1,8 @@
 import Surgery from '../models/surgery_model.js';
 import SurgeryType from '../models/surgery_types.js';
+import User from '../models/user_model.js';
+import {v4 as uuid} from 'uuid';
+import { sendmail } from '../sendemail.js';
 
 
 export const createNewSurgeryType = async(req,res,next) =>{
@@ -22,14 +25,30 @@ export const getAllSurgeryTypes = async(req,res,next) =>{
 }
 
 
-export const saveSchedule = async(req,res,next) =>{
+export const saveSchedule = async(data,res) =>{
     try{
-        const data = req.data;
-        const newSchedule = await Surgery.create(data);
-        return res.status(201).json({message:"Schedule Saved Successfully.",newSchedule});
+        const {patient} = data;
+        const {email,user_name} = await User.findByPk(patient, { attributes: ['email', 'user_name'] });
+        const URLId = uuid();
+        const questionarieURL = `http://localhost:3000/medical-questionaries/${URLId}`;
+        const subject = "Medical History Questionarie and Consent Form";
+        const html = `
+        Hi, ${user_name} <br/>
+        <strong>Please Fill the Patient-Opt Form to confirm your surgery</strong><br/>
+        <p>All data will be confidential and protected from unauthorized party</p>
+        <a href = ${questionarieURL}>${questionarieURL}</a><br/>
+        <br/>
+        If any queries please reply this email. Thankyou.<br/>
+
+        Regards,<br/>
+        Time Doctor
+        `;
+        const response = await Surgery.create(data);
+        sendmail(email,subject,html);
+        return response;
     }
     catch(e){
-        next(e);
+        console.log(e);
     }
 }
 
