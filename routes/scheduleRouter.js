@@ -1,5 +1,5 @@
 import express from 'express';
-import { rescheduleEvent } from '../controllers/calendarController.js';
+import { rescheduleEvent, cancelEvent } from '../controllers/calendarController.js';
 import { getScheduledData,saveSchedule,getAllSurgeryTypes,createNewSurgeryType } from '../controllers/scheduleController.js';
 import { LoginRequired } from '../middlewares/login_required.js';
 
@@ -10,5 +10,6 @@ scheduleRouter.post("/api/addSchedule",LoginRequired,saveSchedule);
 scheduleRouter.patch("/api/reschedule",LoginRequired,rescheduleEvent);
 scheduleRouter.get("/api/surgeryType",LoginRequired,getAllSurgeryTypes)
 scheduleRouter.post("/api/surgeryType",createNewSurgeryType);
+scheduleRouter.patch("/api/cancel-event",LoginRequired,cancelEvent);
 
 export default scheduleRouter;

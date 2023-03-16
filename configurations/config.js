@@ -17,5 +17,6 @@ export const config = {
     twilio_account_sid : process.env.Account_sid,
     jwt_secret_key: process.env.Secret_Key,
     host: process.env.Host,
-    port: process.env.Port
+    port: process.env.Port,
+    db_port : process.env.DB_Port
 }

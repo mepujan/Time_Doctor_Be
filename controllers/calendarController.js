@@ -223,3 +223,23 @@ export const rescheduleEvent = (req,res,next)=>{
   }
   return res.status(500).json({"message":"Cannot Update the Schedule"});
 }
+
+export const cancelEvent = async(req,res,next)=>{ 
+    const newEvent = req.body; 
+    let { eventId } = newEvent; 
+    try {
+      const calendar = google.calendar({ version: 'v3', auth });
+    const response = await calendar.events.delete({ 
+      calendarId:'primary',
+      eventId:eventId 
+    });
+    if(response === null || response === ''){
+      return res.status(200).json({"message":"Schedule Cancelled Successfully"});
+    }else{
+      return res.status(500).json({"message":"Cannot cancel the Schedule"});
+  } 
+}catch (err) { 
+  return null;
+  } 
+
+}
