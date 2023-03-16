@@ -209,8 +209,8 @@ export const addEvents = async (req, res, next) => {
   const doctor_data = await User.findByPk(doctor, { attributes: ['email', 'mobile_number', 'user_name'] });
   const patient_data = await User.findByPk(patient, { attributes: ['email', 'mobile_number', 'user_name'] });
   const isAdded = authorize().then((value) => addEvent(value, data, patient_data, doctor_data)).catch(console.error);
-  // const dataSaved = saveSchedule(data);
-  if (isAdded) {
+  const dataSaved = saveSchedule(data);
+  if (isAdded && dataSaved) {
     return res.status(200).json({ message: "Event Added Successfully" });
   }
   return res.status(500).json({ message: "Something went wrong" })
@@ -248,4 +248,28 @@ export const updateEventFromFile = async (req, res, next) => {
   }
 }
 
+const cancelSchedule = (auth, eventId) => {
+  try {
+    const calendar = google.calendar({ version: 'v3', auth });
+    calendar.events.delete({
+      auth: auth,
+      calendarId: 'primary',
+      eventId: eventId
+    });
+    return true;
+  } catch (e) {
+    console.log(e);
+  }
+}
 
+export const deleteSchedule = (req, res, next) => {
+  try {
+    const { eventId } = req.body;
+    const isDeleted = authorize().then((value) => cancelSchedule(value, eventId)).catch(console.error)
+    if (isDeleted) {
+      return res.status(200).json("Event Deleted Successfully");
+    }
+  } catch (e) {
+    next(e);
+  }
+}
