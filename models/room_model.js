@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from "../sequelize_connection.js";
-import Surgery from './surgery_model';
+import Surgery from './surgery_model.js';
 
 class SurgeryRoom extends Model { }
 
@@ -12,13 +12,14 @@ export default SurgeryRoom.init(
             autoIncrement: true
         },
         number: {
-            type: String,
-            allowNull: false
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
         },
         is_available: {
             type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: true
+            defaultValue: true,
+            allowNull: false
         }
     }, {
     sequelize,

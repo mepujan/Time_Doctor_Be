@@ -1,5 +1,5 @@
 import express from 'express';
-import { saveRoomToDatabase, fetchAvailableRooms } from '../controllers/room_controller';
+import { saveRoomToDatabase, fetchAvailableRooms } from '../controllers/room_controller.js';
 
 const roomRouter = express.Router();
 
