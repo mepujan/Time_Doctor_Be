@@ -1,6 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from "../sequelize_connection.js";
-import Surgery from './surgery_model.js';
 
 class SurgeryRoom extends Model { }
 
@@ -28,5 +27,4 @@ export default SurgeryRoom.init(
     modelName: 'surgeryRoom'
 }
 );
-SurgeryRoom.hasOne(Surgery);
 SurgeryRoom.sync();

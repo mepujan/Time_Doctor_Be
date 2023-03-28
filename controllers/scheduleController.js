@@ -1,35 +1,38 @@
 import Surgery from '../models/surgery_model.js';
 import SurgeryType from '../models/surgery_types.js';
 import User from '../models/user_model.js';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { sendmail } from '../sendemail.js';
+import scheduleRoom from '../models/room_model.js';
+import { where } from 'sequelize';
 
 
-export const createNewSurgeryType = async(req,res,next) =>{
-    try{
+export const createNewSurgeryType = async (req, res, next) => {
+    try {
         const newType = await SurgeryType.create(req.body);
-        return res.status(201).json({message:"Surgery Type has added.",newType});
+        return res.status(201).json({ message: "Surgery Type has added.", newType });
 
-    }catch(e){
+    } catch (e) {
         next(e)
     }
 }
 
-export const getAllSurgeryTypes = async(req,res,next) =>{
-    try{
+export const getAllSurgeryTypes = async (req, res, next) => {
+    try {
         const types = await SurgeryType.findAll({});
         return res.status(200).json(types);
-    }catch(e){
+    } catch (e) {
         next(e);
     }
 }
 
 
-export const saveSchedule = async(data,res) =>{
-    try{
-        const {patient} = data;
-        const {email,user_name} = await User.findByPk(patient, { attributes: ['email', 'user_name'] });
+export const saveSchedule = async (data, res) => {
+    try {
+        const { patient, surgeryRoomId } = data;
+        const { email, user_name } = await User.findByPk(patient, { attributes: ['email', 'user_name'] });
         const URLId = uuid();
+        scheduleRoom.update({ is_available: false }, { where: { id: surgeryRoomId } });
         const questionarieURL = `http://localhost:3000/medical-questionaries/${URLId}`;
         const subject = "Medical History Questionarie and Consent Form";
         const html = `
@@ -44,22 +47,22 @@ export const saveSchedule = async(data,res) =>{
         Time Doctor
         `;
         const response = await Surgery.create(data);
-        sendmail(email,subject,html);
+        sendmail(email, subject, html);
         return response;
     }
-    catch(e){
+    catch (e) {
         console.log(e);
     }
 }
 
-export const getScheduledData = async(req,res,next) =>{
+export const getScheduledData = async (req, res, next) => {
     // returns the list of scheduled data of the logged in user.
-    try{
-        const {id} = req;
-        const scheduledData = await Surgery.findAll({where:{patient:id}});
-        return res.status(200).json(scheduledData?scheduledData:[]);
+    try {
+        const { id } = req;
+        const scheduledData = await Surgery.findAll({ where: { patient: id } });
+        return res.status(200).json(scheduledData ? scheduledData : []);
     }
-    catch(err){
+    catch (err) {
         next(err);
     }
 
